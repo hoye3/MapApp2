@@ -2,6 +2,7 @@ package com.example.clifners6171.mapapp2;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -24,6 +25,9 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static android.location.LocationManager.*;
 import static android.location.LocationManager.NETWORK_PROVIDER;
 import static com.example.clifners6171.mapapp2.R.styleable.View;
@@ -40,6 +44,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Location myLocation;
     private static final int MY_LOC_ZOOM_FACTOR = 17;
     int color = Color.BLUE;
+    List<Circle> markerList = new ArrayList<Circle>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,7 +85,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-        mMap.setMyLocationEnabled(true);
+        mMap.setMyLocationEnabled(false); //used to be true
+        markerList = new ArrayList<Circle> ();
         getLocation();
 
     }
@@ -90,6 +96,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         else
             mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+    }
+
+    public void findPOI(View v) {
+        //Intent intent = new Intent(this,);
+        //EditText editText = (EditText) findViewById(R.id.editText);
+        //String message = editText.getText().toString();
+        //intent.putExtra(EXTRA_MESSAGE, message);
+        //startActivity(intent);
+
+    }
+
+    public void clearMarkers(View v) {
+        mMap.clear();
+        markerList.clear();
+
     }
 
 
@@ -150,6 +171,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         public void onLocationChanged(Location location) {
             //output in Log.d and Toast that GPS is enabled and working
             Log.d("MyMaps", "GPS enabled and working");
+            Toast.makeText(context, "GPS enabled and working", Toast.LENGTH_SHORT);
 
             //drop a marker on map - create a method called dropAmarker (not a blue dot)
             color = Color.RED;
@@ -216,6 +238,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         public void onLocationChanged(Location location) {
             //output in Log.d and Toast that GPS is enabled and working
             Log.d("MyMaps", "Network enabled and working");
+            Toast.makeText(context, "Network enabled and working", Toast.LENGTH_SHORT);
 
             //drop a marker on map - create a method called dropAmarker (not a blue dot)
             color = Color.BLACK;
@@ -276,6 +299,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 //drop the actual marker
                 Circle circle = mMap.addCircle(new CircleOptions().center(userLocation).radius(10).strokeColor(Color.GREEN).fillColor(color));
+                markerList.add(circle);
                 mMap.animateCamera(update);
 
             }

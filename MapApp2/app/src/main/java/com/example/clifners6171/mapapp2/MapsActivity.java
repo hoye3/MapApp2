@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.location.LocationProvider;
@@ -12,6 +14,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.EditText;
 import android.widget.Toast;
 import android.view.View;
 
@@ -25,8 +28,10 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import static android.location.LocationManager.*;
 import static android.location.LocationManager.NETWORK_PROVIDER;
@@ -45,6 +50,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final int MY_LOC_ZOOM_FACTOR = 17;
     int color = Color.BLUE;
     List<Circle> markerList = new ArrayList<Circle>();
+    Geocoder geocoder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,7 +92,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             return;
         }
         mMap.setMyLocationEnabled(false); //used to be true
-        markerList = new ArrayList<Circle> ();
+        markerList = new ArrayList<Circle>();
         getLocation();
 
     }
@@ -98,18 +104,68 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
     }
 
-    public void findPOI(View v) {
-        //Intent intent = new Intent(this,);
-        //EditText editText = (EditText) findViewById(R.id.editText);
-        //String message = editText.getText().toString();
-        //intent.putExtra(EXTRA_MESSAGE, message);
-        //startActivity(intent);
+    public void findPOI(View v) throws IOException {
+        EditText editText = (EditText) findViewById(R.id.editText);
+        String message = editText.getText().toString();
+        if (message.length() > 0) {
 
+            //finds location of the search, adds circle to that place on map
+            geocoder = new Geocoder(this, Locale.getDefault());
+
+            //get own location
+            if (isGPSEnabled) {
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    // TODO: Consider calling
+                    //    ActivityCompat#requestPermissions
+                    // here to request the missing permissions, and then overriding
+                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                    //                                          int[] grantResults)
+                    // to handle the case where the user grants the permission. See the documentation
+                    // for ActivityCompat#requestPermissions for more details.
+                    return;
+                }
+                myLocation = locationManager.getLastKnownLocation(GPS_PROVIDER);
+            }
+            else if (isNetworkEnabled) {
+                myLocation = locationManager.getLastKnownLocation(NETWORK_PROVIDER);
+            }
+            List<Address> adresses = geocoder.getFromLocationName(message, 14, myLocation.getLatitude() -.0361, myLocation.getLongitude() -.036, myLocation.getLatitude() +.0361, myLocation.getLongitude() +.036);
+            if(myLocation != null)
+                for (Address address : adresses) {
+                    color = Color.DKGRAY;
+                    LatLng ad = new LatLng(address.getLatitude(), address.getLongitude());
+                    Circle circle = mMap.addCircle(new CircleOptions().center(ad).radius(100).strokeColor(Color.BLACK).fillColor(color));
+                    markerList.add(circle);
+                }
+            else Toast.makeText(this, "No location found", Toast.LENGTH_SHORT);
+
+        }
+        else Toast.makeText(this, "No text entered", Toast.LENGTH_SHORT);
     }
 
     public void clearMarkers(View v) {
         mMap.clear();
         markerList.clear();
+
+    }
+
+    public void trackerOnOff () {
+        /*Intent intent = new Intent("android.location.GPS_ENABLED_CHANGE");
+        if(!isGPSEnabled) {
+            //intent.putExtra("enabled", true);
+            //sendBroadcast(intent);
+            isGPSEnabled = true;
+        } else {
+            //intent.putExtra("enabled", false);
+            //sendBroadcast(intent);
+            //locationManager.removeUpdates(locationListenerGps);
+            isGPSEnabled = false;
+        }*/
+        locationManager.removeUpdates (locationListenerGps);
+
+
+
+
 
     }
 

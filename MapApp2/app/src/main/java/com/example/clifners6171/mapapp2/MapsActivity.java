@@ -113,7 +113,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             geocoder = new Geocoder(this, Locale.getDefault());
 
             //get own location
-            if (isGPSEnabled) {
+            if (isNetworkEnabled) {
                 if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                     // TODO: Consider calling
                     //    ActivityCompat#requestPermissions
@@ -124,12 +124,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     // for ActivityCompat#requestPermissions for more details.
                     return;
                 }
-                myLocation = locationManager.getLastKnownLocation(GPS_PROVIDER);
-            }
-            else if (isNetworkEnabled) {
                 myLocation = locationManager.getLastKnownLocation(NETWORK_PROVIDER);
             }
-            List<Address> adresses = geocoder.getFromLocationName(message, 14, myLocation.getLatitude() -.0361, myLocation.getLongitude() -.036, myLocation.getLatitude() +.0361, myLocation.getLongitude() +.036);
+            else if (isGPSEnabled) {
+                myLocation = locationManager.getLastKnownLocation(GPS_PROVIDER);
+            }
+            List<Address> adresses = geocoder.getFromLocationName(message, 11, myLocation.getLatitude() -.0361, myLocation.getLongitude() -.036, myLocation.getLatitude() +.0361, myLocation.getLongitude() +.036);
             if(myLocation != null)
                 for (Address address : adresses) {
                     color = Color.DKGRAY;
@@ -137,7 +137,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     Circle circle = mMap.addCircle(new CircleOptions().center(ad).radius(100).strokeColor(Color.BLACK).fillColor(color));
                     markerList.add(circle);
                 }
-            else Toast.makeText(this, "No location found", Toast.LENGTH_SHORT);
+            else Toast.makeText(this, "No location found", Toast.LENGTH_SHORT);  //add .show() to the end?
 
         }
         else Toast.makeText(this, "No text entered", Toast.LENGTH_SHORT);
@@ -161,10 +161,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //locationManager.removeUpdates(locationListenerGps);
             isGPSEnabled = false;
         }*/
-        locationManager.removeUpdates (locationListenerGps);
-
-
-
+        //locationManager.removeUpdates (locationListenerGps);
 
 
     }

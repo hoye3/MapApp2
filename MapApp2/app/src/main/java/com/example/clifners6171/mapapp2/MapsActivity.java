@@ -98,6 +98,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void mapView(View v) {
+        //change map style from satellite to normal and back again with button click
         if (mMap.getMapType() == GoogleMap.MAP_TYPE_SATELLITE)
             mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         else
@@ -129,6 +130,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             else if (isGPSEnabled) {
                 myLocation = locationManager.getLastKnownLocation(GPS_PROVIDER);
             }
+
+            //get the address of things in a 5 mi x 5 mi box around location with inputted name
             List<Address> adresses = geocoder.getFromLocationName(message, 11, myLocation.getLatitude() -.0361, myLocation.getLongitude() -.036, myLocation.getLatitude() +.0361, myLocation.getLongitude() +.036);
             if(myLocation != null)
                 for (Address address : adresses) {
@@ -137,15 +140,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     Circle circle = mMap.addCircle(new CircleOptions().center(ad).radius(100).strokeColor(Color.BLACK).fillColor(color));
                     markerList.add(circle);
                 }
-            else Toast.makeText(this, "No location found", Toast.LENGTH_SHORT);  //add .show() to the end?
+            else Toast.makeText(this, "No location found", Toast.LENGTH_SHORT).show();
 
         }
-        else Toast.makeText(this, "No text entered", Toast.LENGTH_SHORT);
+        else Toast.makeText(this, "No text entered", Toast.LENGTH_SHORT).show();
     }
 
+    //clear all markers from the map - linked to button_clearMarkers
     public void clearMarkers(View v) {
         mMap.clear();
         markerList.clear();
+        Toast.makeText(this, "Markers cleared", Toast.LENGTH_SHORT).show();
 
     }
 
@@ -162,7 +167,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             isGPSEnabled = false;
         }*/
         //locationManager.removeUpdates (locationListenerGps);
-
+        Toast.makeText(this, "failed to turn tracker off/on", Toast.LENGTH_SHORT).show();
 
     }
 
@@ -197,7 +202,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     locationManager.requestLocationUpdates(NETWORK_PROVIDER, MIN_TIME_BN_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, locationListenerNetwork);
 
                     Log.d("MyMaps", "getLocation:NetworkLoc update request successful");
-                    Toast.makeText(this, "Using Network", Toast.LENGTH_SHORT);
+                    Toast.makeText(this, "Using Network", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -207,7 +212,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 locationManager.requestLocationUpdates(GPS_PROVIDER, MIN_TIME_BN_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, locationListenerGps);
 
                 Log.d("MyMaps", "getLocation: GPSLoc update request successful");
-                Toast.makeText(this, "Using Network", Toast.LENGTH_SHORT);
+                Toast.makeText(this, "Using Network", Toast.LENGTH_SHORT).show();
             }
 
         } catch (Exception e) {
@@ -224,7 +229,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         public void onLocationChanged(Location location) {
             //output in Log.d and Toast that GPS is enabled and working
             Log.d("MyMaps", "GPS enabled and working");
-            Toast.makeText(context, "GPS enabled and working", Toast.LENGTH_SHORT);
+            Toast.makeText(context, "GPS enabled and working", Toast.LENGTH_SHORT).show();
 
             //drop a marker on map - create a method called dropAmarker (not a blue dot)
             color = Color.RED;
@@ -291,7 +296,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         public void onLocationChanged(Location location) {
             //output in Log.d and Toast that GPS is enabled and working
             Log.d("MyMaps", "Network enabled and working");
-            Toast.makeText(context, "Network enabled and working", Toast.LENGTH_SHORT);
+            Toast.makeText(context, "Network enabled and working", Toast.LENGTH_SHORT).show();
 
             //drop a marker on map - create a method called dropAmarker (not a blue dot)
             color = Color.BLACK;
@@ -313,10 +318,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         @Override
         public void onProviderDisabled(String provider) {}
-
-
-        //get another LocationListener, but with Network. Do same type of thing for each method, except for onLocationChanged, also add relaunch the network provider request (requestLocatoinUpdates (NETWORK_PROVIDER) )
-        //for statusChange, just output a message and ignore the switch
 
 
     };
